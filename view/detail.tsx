@@ -73,7 +73,7 @@ function Fields({ issue }: { issue: Issue }) {
     if (!clean) return;
     setNewLabel("");
     close();
-    void tab.edit({ kind: "labels", id: issue.id, add: [clean], remove: [] }, `Labelled ${issue.id} ${clean}`);
+    void tab.edit({ kind: "labels", id: issue.id, add: [clean], remove: [] }, `Labelled ${idWithTitle(tab.graph, issue.id)} ${clean}`);
   };
   return (
     <div className="fields">
@@ -86,7 +86,7 @@ function Fields({ issue }: { issue: Issue }) {
             chosen={[issue.status]}
             onChange={([picked]) => {
               close();
-              if (picked && picked !== issue.status) void tab.edit({ kind: "status", id: issue.id, status: picked }, `${issue.id} is ${STATUS_WORDS[picked]!.toLowerCase()}`);
+              if (picked && picked !== issue.status) void tab.edit({ kind: "status", id: issue.id, status: picked }, `${idWithTitle(tab.graph, issue.id)} is ${STATUS_WORDS[picked]!.toLowerCase()}`);
             }}
           />
         )}
@@ -99,7 +99,7 @@ function Fields({ issue }: { issue: Issue }) {
             chosen={[issue.type]}
             onChange={([picked]) => {
               close();
-              if (picked && picked !== issue.type) void tab.edit({ kind: "type", id: issue.id, type: picked }, `${issue.id} is a ${TYPE_WORDS[picked]!.toLowerCase()}`);
+              if (picked && picked !== issue.type) void tab.edit({ kind: "type", id: issue.id, type: picked }, `${idWithTitle(tab.graph, issue.id)} is a ${TYPE_WORDS[picked]!.toLowerCase()}`);
             }}
           />
         )}
@@ -112,7 +112,7 @@ function Fields({ issue }: { issue: Issue }) {
             chosen={[String(issue.priority)]}
             onChange={([picked]) => {
               close();
-              if (picked !== undefined && Number(picked) !== issue.priority) void tab.edit({ kind: "priority", id: issue.id, priority: Number(picked) }, `${issue.id} is P${picked}`);
+              if (picked !== undefined && Number(picked) !== issue.priority) void tab.edit({ kind: "priority", id: issue.id, priority: Number(picked) }, `${idWithTitle(tab.graph, issue.id)} is P${picked}`);
             }}
           />
         )}
@@ -127,7 +127,7 @@ function Fields({ issue }: { issue: Issue }) {
             onChange={([picked]) => {
               close();
               const assignee = picked || null;
-              if (picked !== undefined && assignee !== issue.assignee) void tab.edit({ kind: "assignee", id: issue.id, assignee }, assignee ? `Assigned ${issue.id} to ${assignee}` : `Unassigned ${issue.id}`);
+              if (picked !== undefined && assignee !== issue.assignee) void tab.edit({ kind: "assignee", id: issue.id, assignee }, assignee ? `Assigned ${idWithTitle(tab.graph, issue.id)} to ${assignee}` : `Unassigned ${idWithTitle(tab.graph, issue.id)}`);
             }}
           />
         )}
@@ -135,7 +135,7 @@ function Fields({ issue }: { issue: Issue }) {
       {issue.labels.map((label) => (
         <span key={label} className="label removable">
           {label}
-          <button type="button" aria-label={`Remove the label ${label}`} onClick={() => void tab.edit({ kind: "labels", id: issue.id, add: [], remove: [label] }, `Took ${label} off ${issue.id}`)}>
+          <button type="button" aria-label={`Remove the label ${label}`} onClick={() => void tab.edit({ kind: "labels", id: issue.id, add: [], remove: [label] }, `Took ${label} off ${idWithTitle(tab.graph, issue.id)}`)}>
             ×
           </button>
         </span>
@@ -175,17 +175,17 @@ function Actions({ issue }: { issue: Issue }) {
     <div className="actions">
       {!closed && <WorkOnThis issue={issue} />}
       {!closed && issue.type !== "epic" && issue.status !== "in_progress" && (
-        <button type="button" className="button" data-hint="In progress, assigned to you" onClick={() => void tab.edit({ kind: "claim", id: issue.id }, `Claimed ${issue.id}`)}>
+        <button type="button" className="button" data-hint="In progress, assigned to you" onClick={() => void tab.edit({ kind: "claim", id: issue.id }, `Claimed ${idWithTitle(tab.graph, issue.id)}`)}>
           Claim
         </button>
       )}
       {mine && (
-        <button type="button" className="button" data-hint="Back to open, unassigned" onClick={() => void tab.edit({ kind: "unclaim", id: issue.id }, `Released ${issue.id}`)}>
+        <button type="button" className="button" data-hint="Back to open, unassigned" onClick={() => void tab.edit({ kind: "unclaim", id: issue.id }, `Released ${idWithTitle(tab.graph, issue.id)}`)}>
           Release
         </button>
       )}
       {closed ? (
-        <button type="button" className="button" onClick={() => void tab.edit({ kind: "reopen", id: issue.id }, `Reopened ${issue.id}`)}>
+        <button type="button" className="button" onClick={() => void tab.edit({ kind: "reopen", id: issue.id }, `Reopened ${idWithTitle(tab.graph, issue.id)}`)}>
           Reopen
         </button>
       ) : (
@@ -265,7 +265,7 @@ function Dependencies({ issue, links }: { issue: Issue; links: Link[] }) {
   const blocking = graph.blocking.get(issue.id) ?? [];
   const children = graph.children.get(issue.id) ?? [];
   const parent = issue.parent;
-  const unlink = (on: string) => void tab.edit({ kind: "unlink", id: issue.id, on }, `Unlinked ${issue.id} from ${on}`);
+  const unlink = (on: string) => void tab.edit({ kind: "unlink", id: issue.id, on }, `Unlinked ${idWithTitle(tab.graph, issue.id)} from ${idWithTitle(graph, on)}`);
   return (
     <div className="dependencies">
       {parent && (
@@ -380,7 +380,7 @@ function CommentBox({ issue }: { issue: Issue }) {
   const post = async () => {
     if (!text.trim()) return;
     setBusy(true);
-    const done = await tab.edit({ kind: "comment", id: issue.id, text }, "Comment posted");
+    const done = await tab.edit({ kind: "comment", id: issue.id, text }, `Commented on ${idWithTitle(tab.graph, issue.id)}`);
     setBusy(false);
     if (done) {
       setText("");

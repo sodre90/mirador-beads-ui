@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { boardOf, DONE_DAYS, passes, titleMatches } from "../beads/derive.ts";
 import type { Issue } from "../beads/model.ts";
-import { useTab } from "./bridge.ts";
+import { idWithTitle, useTab } from "./bridge.ts";
 import { Card, DRAGGED_TYPE } from "./card.tsx";
 import { BoardCounts, FilterBar } from "./top.tsx";
 
@@ -62,7 +62,7 @@ export function NowView() {
   const claim = (id: string) => {
     const issue = graph.byId.get(id);
     if (!issue || issue.status === "in_progress") return;
-    void tab.edit({ kind: "claim", id }, `Claimed ${id}`);
+    void tab.edit({ kind: "claim", id }, `Claimed ${idWithTitle(tab.graph, issue.id)}`);
   };
   const close = (id: string) => {
     const issue = graph.byId.get(id);

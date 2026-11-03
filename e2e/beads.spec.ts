@@ -72,6 +72,7 @@ test("a workspace connects to its beads, and its epics, issues and memories are 
     await card(page, "kt-7").getByRole("button", { name: "Claim" }).click();
     await expect(column(page, "In progress").locator('.card[data-id="kt-7"]')).toBeVisible();
     expect(shown("kt-7")).toMatchObject({ status: "in_progress", assignee: "dana" });
+    await expect(toast(page)).toContainText("Claimed kt-7 (Notes vanish after renaming a folder)");
     await toast(page).getByRole("button", { name: "Undo" }).click();
     await expect(column(page, "Ready").locator('.card[data-id="kt-7"]')).toBeVisible();
     expect(shown("kt-7").status).toBe("open");

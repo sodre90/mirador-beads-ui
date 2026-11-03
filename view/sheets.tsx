@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { shellText, writeArgs } from "../beads/bd.ts";
 import { isClosed, titleMatches } from "../beads/derive.ts";
 import { PRIORITIES, type Issue, type IssueType, type Memory, type WriteAction } from "../beads/model.ts";
-import { failureText, send, useTab, type Sheet } from "./bridge.ts";
+import { failureText, idWithTitle, send, useTab, type Sheet } from "./bridge.ts";
 import { PRIORITY_WORDS, Spinner, TYPE_WORDS, TypeBadge } from "./icons.tsx";
 import { MarkdownText } from "./markdown.tsx";
 
@@ -99,7 +99,7 @@ const named = (issue: Issue) => `${issue.id} (${issue.title})`;
 function CloseSheet({ issue }: { issue: Issue }) {
   const tab = useTab();
   const [reason, setReason] = useState("");
-  const write = useWrite(`Closed ${issue.id}`);
+  const write = useWrite(`Closed ${idWithTitle(tab.graph, issue.id)}`);
   const action = { kind: "close", id: issue.id, reason } as const;
   const openChildren = (tab.graph.children.get(issue.id) ?? []).filter((child) => !isClosed(child));
   const waiting = tab.graph.blocking.get(issue.id)?.filter((other) => !isClosed(other)) ?? [];
@@ -123,10 +123,11 @@ const DEFER_CHOICES = [
 type DeferMode = (typeof DEFER_CHOICES)[number][0] | "date" | "indefinitely";
 
 function DeferSheet({ issue }: { issue: Issue }) {
+  const tab = useTab();
   const [mode, setMode] = useState<DeferMode>("next monday");
   const [date, setDate] = useState("");
   const until = mode === "date" ? date : mode === "indefinitely" ? "" : mode;
-  const write = useWrite(`Deferred ${issue.id}`);
+  const write = useWrite(`Deferred ${idWithTitle(tab.graph, issue.id)}`);
   const action = { kind: "defer", id: issue.id, until } as const;
   return (
     <SheetFrame title={`Defer ${issue.id}?`} command={action} footer={<Buttons {...write} confirm="Defer it" disabled={mode === "date" && !date} onConfirm={() => write.run(action)} />}>
@@ -237,7 +238,7 @@ function NoteSheet({ issue }: { issue: Issue }) {
   const add = async () => {
     if (!text.trim()) return;
     setBusy(true);
-    const done = await tab.edit({ kind: "append-note", id: issue.id, text: text.trim() }, `Added a note to ${issue.id}`);
+    const done = await tab.edit({ kind: "append-note", id: issue.id, text: text.trim() }, `Added a note to ${idWithTitle(tab.graph, issue.id)}`);
     setBusy(false);
     if (done) tab.showSheet(null);
   };
@@ -260,7 +261,7 @@ function LinkSheet({ issue }: { issue: Issue }) {
   const [kind, setKind] = useState<string>("blocks");
   const [query, setQuery] = useState("");
   const [on, setOn] = useState<Issue | null>(null);
-  const write = useWrite(`Linked ${issue.id}`);
+  const write = useWrite(`Linked ${idWithTitle(tab.graph, issue.id)}`);
   const matches = query.trim() ? tab.graph.issues.filter((other) => other.id !== issue.id && titleMatches(other, query)).slice(0, 8) : [];
   const action = on ? ({ kind: "link", id: issue.id, on: on.id, type: kind } as const) : null;
   return (
