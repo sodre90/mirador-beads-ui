@@ -80,6 +80,9 @@ export function IssuesView() {
   const shown = graph.issues.filter((issue) => passes(graph, issue, prefs.filter, state.me) && searched(issue));
   const groups = groupsOf(graph, shown, prefs.group, prefs.sort, prefs.tree);
   const fold = (key: string) => setFolded((was) => new Set(was.has(key) ? [...was].filter((each) => each !== key) : [...was, key]));
+  const foldable = groups.filter((group) => group.title).map((group) => group.key);
+  const allFolded = foldable.length > 0 && foldable.every((key) => folded.has(key));
+  const foldAll = () => setFolded((was) => (allFolded ? new Set() : new Set([...was, ...foldable])));
   return (
     <section className="list" aria-label="Issues">
       <FilterBar
@@ -96,6 +99,11 @@ export function IssuesView() {
             <button type="button" className={`chip ${prefs.tree ? "set" : ""}`} aria-pressed={prefs.tree} data-hint="Children under their parent" onClick={() => tab.setPrefs({ ...prefs, tree: !prefs.tree })}>
               Tree
             </button>
+            {foldable.length > 0 && (
+              <button type="button" className="chip" onClick={foldAll}>
+                {allFolded ? "Expand all" : "Collapse all"}
+              </button>
+            )}
           </>
         }
       />

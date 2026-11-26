@@ -97,8 +97,19 @@ test("a workspace connects to its beads, and its epics, issues and memories are 
     await shoot(page, "epics");
   });
 
-  await test.step("the search reads long texts too, and the issue opens beside the list", async () => {
+  await test.step("the issues' groups collapse and expand all at once", async () => {
     await view(page, "Issues").click();
+    const groupFolds = tab(page).locator(".group-fold");
+    await expect(groupFolds.first()).toBeVisible();
+    await tab(page).getByRole("button", { name: "Collapse all" }).click();
+    await expect(tab(page).locator(".list-body .row")).toHaveCount(0);
+    await expect(groupFolds.and(tab(page).locator('[aria-expanded="true"]'))).toHaveCount(0);
+    await tab(page).getByRole("button", { name: "Expand all" }).click();
+    await expect(row(page, "kt-7")).toBeVisible();
+    await expect(groupFolds.and(tab(page).locator('[aria-expanded="false"]'))).toHaveCount(0);
+  });
+
+  await test.step("the search reads long texts too, and the issue opens beside the list", async () => {
     await tab(page).getByLabel("Search").fill("IndexedDB");
     await expect(row(page, "kt-off.2")).toBeVisible();
     await expect(row(page, "kt-7")).toHaveCount(0);
