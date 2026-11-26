@@ -7,7 +7,7 @@ A [Mirador](https://github.com/sodre90/mirador) plugin: the [beads](https://gith
 - **Connects by itself.** The tab finds the database `bd` sees in the workspace's folder and connects once you confirm.
 - **Now.** A board of what's in progress, what's ready (open, with nothing open in its way), what's blocked and what closed this week. Drag a ready card to In progress to claim it, or to Done to close it.
 - **Epics.** Each open epic with its progress bar, what's next, and the tree of its work. An epic whose work is all done offers to close itself. Hand an epic to the agent to plan.
-- **Issues.** One list with chips for status, assignee, epic, type, priority and label. It groups by epic, status, type or priority and shows children under their parents. The search reads descriptions, design, acceptance criteria and notes too.
+- **Issues.** One list with chips for status, assignee, epic, type, priority and label. It groups by epic, status, type or priority and shows children under their parents. Collapse all folds every group at once. The search reads descriptions, design, acceptance criteria and notes too.
 - **Detail beside the list.** Status, type, priority, assignee and labels change from their pickers. Description, design, acceptance criteria and notes edit from it, in Markdown with a preview. A map shows what the issue waits for and what waits for it, and the timeline shows its comments and every change from bd's events journal.
 - **Memories.** What `bd remember` keeps, grouped by key, searched as you type, edited, mentioned to the agent or forgotten.
 - **Activity.** What happened across the database, by whom, day by day.
